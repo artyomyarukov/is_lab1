@@ -2,12 +2,12 @@ package com.yarukov.model;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.*;
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,37 +23,45 @@ public class City {
 
     @Column(nullable = false)
     @NotBlank
+    @Pattern(regexp = "^[A-ZА-ЯЁ][a-zа-яё]*(?:[\\s-][A-ZА-ЯЁ][a-zа-яё]*)*$", message = "Каждое слово должно начинаться с заглавной буквы")
     private String name;
 
 
 
-    private LocalDateTime creationDate;
 
-    @Positive
+
+
     @Column(nullable = false)
+    @Max(value = 100000)
+    @Positive(message = "Площадь не может быть отрицательной")
     private double area;
 
-    @Positive
+    @Positive(message = "Население не может быть отрицательным")
     @Column(nullable = false)
     private Long population;
     private ZonedDateTime establishmentDate;
 
-    @Column(nullable = false)
+
+    @NotNull(message = "Значение не может быть пустым")
     private Boolean capital;
 
     private Double metersAboveSeaLevel;
 
-    @Column(nullable = false)
-    @Positive
-    @Max(value = 1000)
-    private Integer carCode;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "cities_codes",
+            joinColumns = @JoinColumn(
+                    name = "city_id"),
+            inverseJoinColumns = @JoinColumn(name = "codes_id"))
+
+
+    private List<CarCode> carCode;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Climate climate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Government government;
 
     @ManyToOne
@@ -65,6 +73,8 @@ public class City {
     @JoinColumn(name="coordinates_id",nullable = false)
     private Coordinates coordinates;
 
+
+    private LocalDateTime creationDate;
 
     @PrePersist
     void makeCreationDate(){
