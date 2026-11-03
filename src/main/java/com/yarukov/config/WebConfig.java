@@ -22,7 +22,7 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @EnableAspectJAutoProxy
-@ComponentScan(basePackages = {"com.yarukov", "org.springdoc"})
+@ComponentScan(basePackages = "com.yarukov")
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
@@ -32,7 +32,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtAuthInterceptor)
                 .addPathPatterns("/cities/**", "/humans/**", "/coordinates/**", "/car-codes/**")
-                .excludePathPatterns("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/ws/**");
+                .excludePathPatterns("/auth/**", "/ws/**");
     }
 
     @Bean
