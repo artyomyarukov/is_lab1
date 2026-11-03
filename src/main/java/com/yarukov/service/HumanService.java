@@ -3,7 +3,9 @@ package com.yarukov.service;
 import com.yarukov.aop.NotifyClients;
 import com.yarukov.dao.HumanDAO;
 import com.yarukov.dto.HumanDTO;
+import com.yarukov.mapper.HumanMapper;
 import com.yarukov.model.Human;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,24 +14,24 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class HumanService {
 
     private final HumanDAO humanDAO;
+    private final HumanMapper humanMapper;
 
-    public HumanService(HumanDAO humanDAO) {
-        this.humanDAO = humanDAO;
-    }
+
 
     public List<HumanDTO> findAll() {
         return humanDAO.findAll().stream()
-                .map(this::toDTO)
+                .map(humanMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     public HumanDTO findById(Long id) {
         Human human = humanDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Губернатор с ID " + id + " не найден"));
-        return toDTO(human);
+        return humanMapper.toDTO(human);
     }
 
     @Transactional
@@ -40,7 +42,7 @@ public class HumanService {
                 .surname(dto.getSurname())
                 .age(dto.getAge())
                 .build();
-        return toDTO(humanDAO.save(human));
+        return humanMapper.toDTO(humanDAO.save(human));
     }
 
     @Transactional
@@ -51,7 +53,7 @@ public class HumanService {
         existing.setName(dto.getName());
         existing.setSurname(dto.getSurname());
         existing.setAge(dto.getAge());
-        return toDTO(humanDAO.update(existing));
+        return humanMapper.toDTO(humanDAO.update(existing));
     }
 
     @Transactional
@@ -65,13 +67,5 @@ public class HumanService {
         humanDAO.delete(existing);
     }
 
-    public HumanDTO toDTO(Human human) {
-        if (human == null) return null;
-        return HumanDTO.builder()
-                .id(human.getId())
-                .name(human.getName())
-                .surname(human.getSurname())
-                .age(human.getAge())
-                .build();
-    }
+
 }

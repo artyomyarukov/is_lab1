@@ -3,6 +3,7 @@ package com.yarukov.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -20,8 +22,18 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @EnableAspectJAutoProxy
-@ComponentScan(basePackages = "com.yarukov")
+@ComponentScan(basePackages = {"com.yarukov", "org.springdoc"})
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+
+    private final JwtAuthInterceptor jwtAuthInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(jwtAuthInterceptor)
+                .addPathPatterns("/cities/**", "/humans/**", "/coordinates/**", "/car-codes/**")
+                .excludePathPatterns("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/ws/**");
+    }
 
     @Bean
     public ObjectMapper objectMapper() {
@@ -36,7 +48,6 @@ public class WebConfig implements WebMvcConfigurer {
         converters.add(new MappingJackson2HttpMessageConverter(objectMapper()));
     }
 
-
     @Bean
     public LocalValidatorFactoryBean validator() {
         return new LocalValidatorFactoryBean();
@@ -46,7 +57,6 @@ public class WebConfig implements WebMvcConfigurer {
     public Validator getValidator() {
         return validator();
     }
-
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
