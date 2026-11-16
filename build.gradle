@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'war'
+    id 'org.gretty' version '4.1.4'
 }
 
 group = 'ru.itmo'
@@ -36,6 +37,20 @@ dependencies {
     implementation 'com.zaxxer:HikariCP:5.1.0'
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    implementation 'org.aspectj:aspectjweaver:1.9.22'
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+}
+
+
+gretty {
+    servletContainer = 'tomcat10'
+    httpPort = 8081
+    contextPath = ''
 }
